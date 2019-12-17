@@ -14,5 +14,6 @@ COPY --from=basebuilder /mdig /
 
 RUN apt-get -y update
 RUN apt-get install -y strace 
+RUN apt-get install -y dnsutils 
 
 ENTRYPOINT [ "/bin/bash" ]
