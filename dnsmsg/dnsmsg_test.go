@@ -1,4 +1,4 @@
-package main
+package dnsmsg
 
 import "testing"
 
