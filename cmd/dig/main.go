@@ -5,7 +5,7 @@ import (
 	"log"
 	"net"
 
-	"github.com/cloudnoize/udemy/dig/dnsmsg"
+	"github.com/cloudnoize/dig/dnsmsg"
 )
 
 func main() {

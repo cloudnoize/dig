@@ -9,6 +9,8 @@ import (
 	"strconv"
 	"syscall"
 	"time"
+
+	"github.com/cloudnoize/dig/dnsmsg"
 )
 
 func main() {
@@ -21,6 +23,7 @@ func main() {
 	}()
 
 	localport := flag.Int("p", 53, "local port to listen to")
+	dnsserver := flag.String("d", "8.8.8.8:53", "remote dns")
 	flag.Parse()
 	sport := strconv.Itoa(*localport)
 
@@ -28,12 +31,24 @@ func main() {
 	if err != nil {
 		log.Fatalf(err.Error())
 	}
+	remoteAddr, err := net.ResolveUDPAddr("udp", *dnsserver)
+	if err != nil {
+		log.Fatalf(err.Error())
+	}
+
 	conn, err := net.ListenUDP("udp", add)
 	if err != nil {
 		log.Fatalf(err.Error())
 	}
 	conn.SetReadBuffer(2046)
 	defer conn.Close()
+
+	remConn, err := net.DialUDP("udp", nil, remoteAddr)
+	if err != nil {
+		log.Fatalf(err.Error())
+	}
+	defer remConn.Close()
+
 	for {
 		select {
 		case <-done:
@@ -42,13 +57,17 @@ func main() {
 		default:
 			var buf [2046]byte
 			conn.SetReadDeadline(time.Now().Add(1 * time.Second))
-			_, remaddr, err := conn.ReadFromUDP(buf[:])
+			n, claddr, err := conn.ReadFromUDP(buf[:])
 			if err != nil {
 				continue
 			}
 			go func() {
-				log.Println("Writing to ", remaddr.String())
-				conn.WriteTo(buf[:], remaddr)
+				dq := dnsmsg.NewDnsQuery("")
+				remConn.Write(buf[:n])
+				remConn.ReadFromUDP(buf[:])
+				dq.Deserialize(buf[:])
+				log.Printf("%v", dq)
+				conn.WriteTo(buf[:], claddr)
 			}()
 		}
 	}
