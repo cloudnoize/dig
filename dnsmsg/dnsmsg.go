@@ -108,6 +108,10 @@ func (r *Response) String() string {
 	return ip.String()
 }
 
+func (r *Response) Raw() []byte {
+	return r.res
+}
+
 func NewDnsRes(res []byte) *DnsQuery {
 	dq := &DnsQuery{h: NewDnsHeader(), q: NewQuery("")}
 	dq.Deserialize(res)
@@ -127,6 +131,10 @@ func (dq *DnsQuery) String() string {
 	}
 	res += "	" + dq.r.String()
 	return res
+}
+
+func (dq *DnsQuery) RawRes() []byte {
+	return dq.r.Raw()
 }
 
 func NewDnsQuery(dom string) *DnsQuery {

@@ -66,7 +66,7 @@ func main() {
 				remConn.Write(buf[:n])
 				remConn.ReadFromUDP(buf[:])
 				dq.Deserialize(buf[:])
-				log.Printf("%v", dq)
+				log.Printf("%v", string(dq.RawRes()))
 				conn.WriteTo(buf[:], claddr)
 			}()
 		}
