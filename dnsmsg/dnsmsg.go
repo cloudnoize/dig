@@ -144,7 +144,7 @@ func (dq *DnsQuery) String() string {
 }
 
 func (dq *DnsQuery) SetTTL(ttl uint32) {
-	dq.SetTTL(ttl)
+	dq.r.SetTTL(ttl)
 }
 
 func (dq *DnsQuery) RawRes() []byte {
