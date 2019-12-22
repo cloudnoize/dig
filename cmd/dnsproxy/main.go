@@ -24,7 +24,9 @@ func main() {
 
 	localport := flag.Int("p", 53, "local port to listen to")
 	dnsserver := flag.String("d", "8.8.8.8:53", "remote dns")
+	ttl := flag.Uint("t", 0, "new ttl")
 	flag.Parse()
+
 	sport := strconv.Itoa(*localport)
 
 	add, err := net.ResolveUDPAddr("udp", ":"+sport)
@@ -66,7 +68,10 @@ func main() {
 				remConn.Write(buf[:n])
 				remConn.ReadFromUDP(buf[:])
 				dq.Deserialize(buf[:])
-				log.Printf("%v", string(dq.RawRes()))
+
+				if *ttl != 0 {
+					dq.SetTTL(uint32(*ttl))
+				}
 				conn.WriteTo(buf[:], claddr)
 			}()
 		}
