@@ -108,6 +108,16 @@ func (r *Response) String() string {
 	return ip.String()
 }
 
+func (r *Response) SetTTL(ttl uint32) {
+	//9 is 2 for pointer, 2 for Type, 2 for Class, 4 for TTL.
+	for i := 0; i < 4; i++ {
+		byttl := byte(ttl)
+		r.res[9-i] = 0
+		r.res[9-i] |= byttl
+		ttl >>= 8
+	}
+}
+
 func (r *Response) Raw() []byte {
 	return r.res
 }
@@ -131,6 +141,10 @@ func (dq *DnsQuery) String() string {
 	}
 	res += "	" + dq.r.String()
 	return res
+}
+
+func (dq *DnsQuery) SetTTL(ttl uint32) {
+	dq.SetTTL(ttl)
 }
 
 func (dq *DnsQuery) RawRes() []byte {

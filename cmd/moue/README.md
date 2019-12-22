@@ -1,0 +1,1 @@
+open a window and capture maouse events on that window, takes X Y coordinates.
