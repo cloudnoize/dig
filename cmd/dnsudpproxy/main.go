@@ -38,6 +38,11 @@ func main() {
 		log.Fatalf(err.Error())
 	}
 
+	go HandleUDP(add, remoteAddr, *ttl, done)
+
+}
+
+func HandleUDP(add, remoteAddr *net.UDPAddr, ttl uint, done chan bool) {
 	conn, err := net.ListenUDP("udp", add)
 	if err != nil {
 		log.Fatalf(err.Error())
@@ -69,12 +74,11 @@ func main() {
 				remConn.ReadFromUDP(buf[:])
 				dq.Deserialize(buf[:])
 
-				if *ttl != 0 {
-					dq.SetTTL(uint32(*ttl))
+				if ttl != 0 {
+					dq.SetTTL(uint32(ttl))
 				}
 				conn.WriteTo(buf[:], claddr)
 			}()
 		}
 	}
-
 }
